@@ -4,15 +4,15 @@
 import html
 from urllib.request import urlopen, Request
 
-#Change language to english. Сan't get conditions in ukrainian.
-#ACCU_URL = " https://www.accuweather.com/uk/ua/kyiv/324505/weather-forecast/324505"
-ACCU_URL = " https://www.accuweather.com/en/ua/kyiv/324505/weather-forecast/324505?lang=en-us"
+ACCU_URL = " https://www.accuweather.com/uk/ua/kyiv/324505/weather-forecast/324505"
+#Change language to english if can't get conditions in ukrainian.
+#ACCU_URL = " https://www.accuweather.com/en/ua/kyiv/324505/weather-forecast/324505?lang=en-us"
 
 # getting page from server
 headers = {'User-Agent': 'Mozila/5.0 (X11; Fedora; Linux x86_64;)'}
 accu_request = Request(ACCU_URL, headers=headers)
 accu_page = urlopen(accu_request).read()
-accu_page = str(accu_page)
+accu_page = str(accu_page, 'utf-8')
 
 # getting temperature
 ACCU_TEMP_TAG = '<span class="large-temp">'
