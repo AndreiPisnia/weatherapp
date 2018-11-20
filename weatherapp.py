@@ -46,7 +46,7 @@ for char in accu_page[accu_cond_value_start:]:
       
 print(f'Condition: {accu_cond} \n')
 
-
+# getting temperature from == RP5 ==
 RP5_URL = ("http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_"
            "%D0%B2_%D0%9A%D0%B8%D1%94%D0%B2%D1%96")
 
@@ -69,3 +69,16 @@ for char in rp5_content[rp5_temp_value_start:]:
 
 print('RP5.UA: \n')
 print(f'Temperature: {html.unescape(rp5_temp)} \n')
+
+# getting conditions from == RP5 ==
+COND_INFO_CONTAINER_TAG = '<div id="forecastShort-content">'
+RP5_COND_TAG = '<span class="second-part">'
+rp5_cond_value_end_index = rp5_content.find(RP5_COND_TAG,
+                                rp5_content.find(COND_INFO_CONTAINER_TAG))
+
+rp5_cond_value_start = rp5_cond_value_end_index
+while rp5_content[rp5_cond_value_start] != '>':
+    rp5_cond_value_start -= 1
+rp5_cond = rp5_content[rp5_cond_value_start:rp5_cond_value_end_index]    
+
+print(f'Condition: {rp5_cond} \n')
