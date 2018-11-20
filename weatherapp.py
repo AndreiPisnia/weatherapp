@@ -45,3 +45,27 @@ for char in accu_page[accu_cond_value_start:]:
         break
       
 print(f'Condition: {accu_cond} \n')
+
+
+RP5_URL = ("http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_"
+           "%D0%B2_%D0%9A%D0%B8%D1%94%D0%B2%D1%96")
+
+rp5_request = Request(RP5_URL, headers=headers)
+rp5_page = urlopen(rp5_request).read()
+rp5_content = rp5_page.decode('utf-8')
+
+WINFO_CONTAINER_TAG = '<div id="ArchTemp">'
+RP5_TEMP_TAG = '<span class="t_0" style="display: block;">'
+rp5_temp_tag_index = rp5_content.find(RP5_TEMP_TAG,
+                                rp5_content.find(WINFO_CONTAINER_TAG))
+rp5_temp_tag_size = len(RP5_TEMP_TAG)
+rp5_temp_value_start = rp5_temp_tag_index + rp5_temp_tag_size
+rp5_temp = ''
+for char in rp5_content[rp5_temp_value_start:]:
+    if char != '<':
+        rp5_temp += char
+    else:
+        break
+
+print('RP5.UA: \n')
+print(f'Temperature: {html.unescape(rp5_temp)} \n')
