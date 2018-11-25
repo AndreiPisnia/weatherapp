@@ -1,4 +1,4 @@
-###!/usr/bin/python3
+#!/usr/bin/python3
 '''Weather app progect
 '''
 import html
@@ -12,6 +12,10 @@ RP5_URL = ("http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_"
            "%D0%B2_%D0%9A%D0%B8%D1%94%D0%B2%D1%96")
 RP5_CONTAINER = '<div class="ArchiveInfo" style="width:80%;">'
 RP5_TAGS = ('<span class="t_0" style="">', '<span class="t_1" style="display: none;">+33 °F</span>, ')
+
+SINOPTIK_URL = "https://ua.sinoptik.ua/%D0%BF%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0-%D0%BA%D0%B8%D1%97%D0%B2"
+SINOPTIK_CONTAINER = '<div class="imgBlock">'
+SINOPTIK_TAGS = ('<p class="today-temp">', 'alt=')
 
 
 def get_request_headers():
@@ -62,7 +66,8 @@ def main():
     """
 
     weather_sites = {"AccuWeather": (ACCU_URL, ACCU_TAGS, ACCU_CONTAINER),
-                     "RP5": (RP5_URL, RP5_TAGS, RP5_CONTAINER)}
+                     "RP5": (RP5_URL, RP5_TAGS, RP5_CONTAINER),
+                     "Sinoptik": (SINOPTIK_URL, SINOPTIK_TAGS, SINOPTIK_CONTAINER)}
     for name in weather_sites:
         url, tags, container = weather_sites[name]
         content = get_page_source(url)
