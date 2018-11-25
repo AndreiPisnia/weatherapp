@@ -5,6 +5,7 @@ import html
 from urllib.request import urlopen, Request
 
 ACCU_URL = " https://www.accuweather.com/uk/ua/kyiv/324505/weather-forecast/324505"
+ACCU_CONTAINER = ('<li class="night current first cl" data-href="https://www.accuweather.com/uk/ua/kyiv/324505/current-weather/324505">')
 ACCU_TAGS = ('<span class="large-temp">', '<span class="cond">')
 
 #'<span class="t_0" style="display: block;">'
@@ -35,11 +36,11 @@ def get_page_source(url):
     page_source = urlopen(request).read()
     return page_source.decode('utf-8')
 
-def get_tag_content(page_content, tag):
+def get_tag_content(page_content, container, tag):
     """Find tag and get information from source page
     """
 
-    tag_index = page_content.find(tag)
+    tag_index = page_content.find(tag, page_content.find(container))
     tag_size = len(tag)
     value_start = tag_index + tag_size
 
@@ -51,29 +52,29 @@ def get_tag_content(page_content, tag):
             break
     return content
 
-def get_weather_info(page_content, tags):
+def get_weather_info(page_content, container, tags):
     """
     """
 
-    return tuple([get_tag_content(page_content, tag) for tag in tags])
+    return tuple([get_tag_content(page_content, container, tag) for tag in tags])
 
 def produce_output(provider_name, temp, condition):
     """
     """
-    print(f'\n {provider_name}')
+    print(f'\n{provider_name}')
     print(f'Temperature: {html.unescape(temp)} \n')
     print(f'Condition: {condition} \n')
-        
+            
 
 def main():
     """ Main entry point.
     """
 
-    weather_sites = {"AccuWeather": (ACCU_URL, ACCU_TAGS)} #"RP5": (RP5_URL, RP5_TAGS)}
+    weather_sites = {"AccuWeather": (ACCU_URL, ACCU_TAGS, ACCU_CONTAINER)} #"RP5": (RP5_URL, RP5_TAGS)}
     for name in weather_sites:
-        url, tags = weather_sites[name]
+        url, container, tags = weather_sites[name]
         content = get_page_source(url)
-        temp, condition = get_weather_info(content, tags)
+        temp, condition = get_weather_info(content, tags, container)
         produce_output(name, temp, condition)
 
 if __name__ == '__main__':
