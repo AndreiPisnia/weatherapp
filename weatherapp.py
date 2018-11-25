@@ -1,27 +1,18 @@
-#!/usr/bin/python3
+###!/usr/bin/python3
 '''Weather app progect
 '''
 import html
 from urllib.request import urlopen, Request
 
 ACCU_URL = " https://www.accuweather.com/uk/ua/kyiv/324505/weather-forecast/324505"
-ACCU_CONTAINER = ('<li class="night current first cl" data-href="https://www.accuweather.com/uk/ua/kyiv/324505/current-weather/324505">')
+ACCU_CONTAINER = '<li class="night current first cl" data-href="https://www.accuweather.com/uk/ua/kyiv/324505/current-weather/324505">'
 ACCU_TAGS = ('<span class="large-temp">', '<span class="cond">')
 
-#'<span class="t_0" style="display: block;">'
+RP5_URL = ("http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_"
+           "%D0%B2_%D0%9A%D0%B8%D1%94%D0%B2%D1%96")
+RP5_CONTAINER = '<div class="ArchiveInfo" style="width:80%;">'
+RP5_TAGS = ('<span class="t_0" style="">', '<span class="t_1" style="display: none;">+33 °F</span>, ')
 
-# getting conditions from == RP5 ==
-#COND_INFO_CONTAINER_TAG = '<div id="forecastShort-content">'
-#RP5_COND_TAG = '<span class="second-part">'
-#rp5_cond_value_end_index = rp5_content.find(RP5_COND_TAG,
-#                                rp5_content.find(COND_INFO_CONTAINER_TAG))
-#
-#rp5_cond_value_start = rp5_cond_value_end_index
-#while rp5_content[rp5_cond_value_start] != '>':
-#    rp5_cond_value_start -= 1
-#rp5_cond = rp5_content[rp5_cond_value_start:rp5_cond_value_end_index]    
-#
-#print(f'Condition: {rp5_cond} \n')
 
 def get_request_headers():
     """
@@ -36,7 +27,7 @@ def get_page_source(url):
     page_source = urlopen(request).read()
     return page_source.decode('utf-8')
 
-def get_tag_content(page_content, container, tag):
+def get_tag_content(page_content, tag, container):
     """Find tag and get information from source page
     """
 
@@ -52,17 +43,17 @@ def get_tag_content(page_content, container, tag):
             break
     return content
 
-def get_weather_info(page_content, container, tags):
+def get_weather_info(page_content, tags, container):
     """
     """
 
-    return tuple([get_tag_content(page_content, container, tag) for tag in tags])
+    return tuple([get_tag_content(page_content, tag, container) for tag in tags])
 
 def produce_output(provider_name, temp, condition):
     """
     """
     print(f'\n{provider_name}')
-    print(f'Temperature: {html.unescape(temp)} \n')
+    print(f'Temperature: {html.unescape(temp)}')
     print(f'Condition: {condition} \n')
             
 
@@ -70,9 +61,10 @@ def main():
     """ Main entry point.
     """
 
-    weather_sites = {"AccuWeather": (ACCU_URL, ACCU_TAGS, ACCU_CONTAINER)} #"RP5": (RP5_URL, RP5_TAGS)}
+    weather_sites = {"AccuWeather": (ACCU_URL, ACCU_TAGS, ACCU_CONTAINER),
+                     "RP5": (RP5_URL, RP5_TAGS, RP5_CONTAINER)}
     for name in weather_sites:
-        url, container, tags = weather_sites[name]
+        url, tags, container = weather_sites[name]
         content = get_page_source(url)
         temp, condition = get_weather_info(content, tags, container)
         produce_output(name, temp, condition)
