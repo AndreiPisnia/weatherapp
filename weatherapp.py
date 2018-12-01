@@ -11,7 +11,7 @@ ACCU_TAGS = ('<span class="large-temp">', '<span class="cond">')
 RP5_URL = ("http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_"
            "%D0%B2_%D0%9A%D0%B8%D1%94%D0%B2%D1%96")
 RP5_CONTAINER = '<div class="ArchiveInfo" style="width:80%;">'
-RP5_TAGS = ('<span class="t_0" style="">', '<span class="t_1" style="display: none;">+33 °F</span>, ')
+RP5_TAGS = ('<span class="t_0" style="">', ' °F</span>, ')
 
 SINOPTIK_URL = "https://ua.sinoptik.ua/%D0%BF%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0-%D0%BA%D0%B8%D1%97%D0%B2"
 SINOPTIK_CONTAINER = '<div class="imgBlock">'
