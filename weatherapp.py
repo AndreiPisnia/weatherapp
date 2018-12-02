@@ -109,14 +109,15 @@ def main(argv):
     KNOWN_COMMANDS = {'accu': 'AccuWeather', 'rp5': 'RP5', 'sinoptik': 'Sinoptik'}
     
     parser = argparse.ArgumentParser()
-    parser.add_argument('command', help='Service name', nargs=1)
+    parser.add_argument('command', help='Service name', nargs='?')
     params = parser.parse_args(argv)
 
     weather_sites = {"AccuWeather": (ACCU_URL, ACCU_TAGS, ACCU_CONTAINER),
                      "RP5": (RP5_URL, RP5_TAGS, RP5_CONTAINER),
                      "Sinoptik": (SINOPTIK_URL, SINOPTIK_TAGS, SINOPTIK_CONTAINER)}
     if params.command:
-        command = params.command[0]
+        command = params.command[:]
+#        print(command)
         if command in KNOWN_COMMANDS:
             weather_sites = {
                 KNOWN_COMMANDS[command]: weather_sites[KNOWN_COMMANDS[command]]
