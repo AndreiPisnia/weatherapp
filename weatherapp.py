@@ -1,10 +1,12 @@
 #!/usr/bin/python3
 '''Weather app progect
 '''
+import sys
 import html
+import argparse
 from urllib.request import urlopen, Request
 
-ACCU_URL = " https://www.accuweather.com/uk/ua/kyiv/324505/weather-forecast/324505"
+ACCU_URL = "  https://www.accuweather.com/uk/ua/kyiv/324505/weather-forecast/324505"
 ACCU_CONTAINER = '<li class="night current first cl" data-href="https://www.accuweather.com/uk/ua/kyiv/324505/current-weather/324505">'
 ACCU_TAGS = ('<span class="large-temp">', '<span class="cond">')
 
@@ -61,13 +63,33 @@ def produce_output(provider_name, temp, condition):
     print(f'Condition: {condition} \n')
             
 
-def main():
+def main(argv):
     """ Main entry point.
     """
+
+#    print(argv)
+#    sys.exit(0)
+
+    KNOWN_COMMANDS = {'accu': 'AccuWeather', 'rp5': 'RP5', 'sinoptik': 'Sinoptik'}
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument('command', help='Service name', nargs=1)
+    params = parser.parse_args(argv)
 
     weather_sites = {"AccuWeather": (ACCU_URL, ACCU_TAGS, ACCU_CONTAINER),
                      "RP5": (RP5_URL, RP5_TAGS, RP5_CONTAINER),
                      "Sinoptik": (SINOPTIK_URL, SINOPTIK_TAGS, SINOPTIK_CONTAINER)}
+    if params.command:
+        command = params.command[0]
+        if command in KNOWN_COMMANDS:
+            weather_sites = {
+                KNOWN_COMMANDS[command]: weather_sites[KNOWN_COMMANDS[command]]
+            }
+        else:
+            print('Unknown command provided!')
+            sys.exit(1)
+
+
     for name in weather_sites:
         url, tags, container = weather_sites[name]
         content = get_page_source(url)
@@ -75,6 +97,6 @@ def main():
         produce_output(name, temp, condition)
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
 
 
