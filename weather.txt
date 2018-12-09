@@ -1,0 +1,6 @@
+Accu Weather: 
+Пассау 
+cond: Слабкий дощ 
+temp: 5° 
+feal_temp: RealFeel® -1° 
+wind: Вітер дує з: Зх-Пд-Зх 17 км/г 

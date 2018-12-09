@@ -137,13 +137,19 @@ def get_weather_info(page_content):
 def produce_output(city_name, info):
     """
     """
+    file = open('weather.txt', 'w')
+    file.write('Accu Weather: \n')
+    file.write(f'{city_name} \n')
+    
     print('Accu Weather: \n')
     print(f'{city_name}')
     print('_'*20)
 
     for key, value in info.items():
         print(f'{key}: {html.unescape(value)}')
+        file.write(f'{key}: {html.unescape(value)} \n')
         
+
 #    print(f'\n{provider_name}')
 #    print(f'Temperature: {html.unescape(temp)}')
 #    print(f'Condition: {condition} \n')
