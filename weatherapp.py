@@ -4,6 +4,7 @@
 '''
 import sys
 import html
+import hashlib
 import argparse
 import configparser
 from pathlib import Path
@@ -11,14 +12,16 @@ from bs4 import BeautifulSoup
 from urllib.request import urlopen, Request
 
 ACCU_URL = ("  https://www.accuweather.com/uk/ua/kyiv/324505/weather-forecast/324505")
-
 ACCU_TAGS = ('<span class="large-temp">', '<span class="cond">')
+ACCU_BROWSE_LOCATIONS = 'https://www.accuweather.com/uk/browse-locations'
+
+CONFIG_LOCATION = 'Location'
+CONFIG_FILE = 'weatherapp.ini'
 
 DEFAULT_NAME = 'Kyiv'
 DEFAULT_URL = 'https://www.accuweather.com/uk/ua/kyiv/324505/weather-forecast/324505'
-ACCU_BROWSE_LOCATIONS = 'https://www.accuweather.com/uk/browse-locations'
-CONFIG_LOCATION = 'Location'
-CONFIG_FILE = 'weatherapp.ini'
+
+CACHE_DIR = '.wappceche'
 
 #RP5_URL = ("http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_"
 #           "%D0%B2_%D0%9A%D0%B8%D1%94%D0%B2%D1%96")
@@ -35,12 +38,30 @@ def get_request_headers():
     """
     return {'User-Agent': 'Mozila/5.0 (X11; Fedora; Linux x86_64;)'}
 
+def get_cache_directory():
+    """Path to cache directory
+    """
+    return Path.home() / CACHE_DIR
+
+def save_cache(url, page_source):
+    """Save page source data to file
+    """
+    url_hash = hashlib.md5(url.encode('utf-8')).hexdigest()
+    cache_dir = get_cache_directory()
+    if not cache_dir.exists():
+        cache_dir.mkdir(parents=True)
+    with (cache_dir / url_hash).open('wb') as cache_file:
+        cashe_file.write(page_source)
+
+
 def get_page_source(url):
     """Use URL and receive requested page decoded by utf-8
     """
 
     request = Request(url, headers=get_request_headers())
     page_source = urlopen(request).read()
+    save_cache(url, page_source)
+    
     return page_source.decode('utf-8')
 
 def get_locations(locations_url):
