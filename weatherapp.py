@@ -21,7 +21,7 @@ CONFIG_FILE = 'weatherapp.ini'
 DEFAULT_NAME = 'Kyiv'
 DEFAULT_URL = 'https://www.accuweather.com/uk/ua/kyiv/324505/weather-forecast/324505'
 
-CACHE_DIR = '.wappceche'
+CACHE_DIR = '.wappcache'
 
 #RP5_URL = ("http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_"
 #           "%D0%B2_%D0%9A%D0%B8%D1%94%D0%B2%D1%96")
@@ -43,8 +43,8 @@ def get_cache_directory():
     """
     return Path.home() / CACHE_DIR
 
-def get_url_hash(url)
-    """Generates hach for given url
+def get_url_hash(url):
+    """Generates hash for given url
     """
     return hashlib.md5(url.encode('utf-8')).hexdigest()
 
@@ -56,19 +56,28 @@ def save_cache(url, page_source):
     if not cache_dir.exists():
         cache_dir.mkdir(parents=True)
     with (cache_dir / url_hash).open('wb') as cache_file:
-        cashe_file.write(page_source)
+        cache_file.write(page_source)
 
 
 def get_cache(url):
     """ Return cache data if any.
     """
 
-    url_hash = get_url_hash(url
+    cache = b''
+    url_hash = get_url_hash(url)
+    cache_dir = get_cache_directory()
+    if cache_dir.exists():
+        cache_path = cache_dir / url_hash
+        if cache_path.exists():
+            with cache_path.open('rb') as cache_file:
+                cache = cache_file.read()
 
+    return cache
 
 def get_page_source(url):
     """Use URL and receive requested page decoded by utf-8
     """
+
     cache = get_cache(url)
     if cache:
         page_source = cache
@@ -100,7 +109,16 @@ def get_configuration_file():
 
 
 def save_configuration(name, url):
-    """
+    """Save selected location to configuration file.
+
+    To save time and not configurate application
+    each time we going to use it.
+
+    :param name: city name
+    :param type: str
+
+    :param url: prefered location URL
+    :param type: str
     """
     parser = configparser.ConfigParser()
     parser[CONFIG_LOCATION] = {'name': name, 'url': url}
@@ -139,7 +157,7 @@ def configurate():
 def get_weather_info(page_content):
     """
     """
-
+#    import pdb; pdb.set_trace()
     city_page = BeautifulSoup(page_content, 'html.parser')
     current_day_section = city_page.find(
         'li', class_='night current first cl')
