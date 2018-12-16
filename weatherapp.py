@@ -84,12 +84,12 @@ def get_cache(url):
 
     return cache
 
-def get_page_source(url):
+def get_page_source(url, refresh=False):
     """Use URL and receive requested page decoded by utf-8
     """
 
     cache = get_cache(url)
-    if cache:
+    if cache and not refresh:
         page_source = cache
     else:
         request = Request(url, headers=get_request_headers())
@@ -98,10 +98,10 @@ def get_page_source(url):
     
     return page_source.decode('utf-8')
 
-def get_locations(locations_url):
+def get_locations(locations_url, refresh=False):
     """
     """
-    locations_page = get_page_source(locations_url)
+    locations_page = get_page_source(locations_url, refersh=refresh)
     soup = BeautifulSoup(locations_page, 'html.parser')
 
     locations = []
@@ -151,20 +151,20 @@ def get_configuration():
     return name, url
 
     
-def configurate():
+def configurate(refresh=False):
     """
     """
-    locations = get_locations(ACCU_BROWSE_LOCATIONS)
+    locations = get_locations(ACCU_BROWSE_LOCATIONS, refresh=refresh)
     while locations:
         for index, location in enumerate(locations):
             print(f'{index + 1}. {location[0]}')
         selected_index = int(input('Please select location: '))
         location = locations[selected_index - 1]
-        locations = get_locations(location[1])
+        locations = get_locations(location[1], refresh=refresh)
 
     save_configuration(*location)
 
-def get_weather_info(page_content):
+def get_weather_info(page_content, refresh=False):
     """
     """
 #    import pdb; pdb.set_trace()
@@ -176,7 +176,7 @@ def get_weather_info(page_content):
     if current_day_section:
         current_day_url = current_day_section.find('a').attrs['href']
         if current_day_url:
-            current_day_page = get_page_source(current_day_url)
+            current_day_page = get_page_source(current_day_url, refresh=refresh)
             if current_day_page:
                 current_day = \
                         BeautifulSoup(current_day_page, 'html.parser')
@@ -218,10 +218,10 @@ def produce_output(city_name, info):
 #    print(f'Temperature: {html.unescape(temp)}')
 #    print(f'Condition: {condition} \n')
             
-def get_accu_weather_info():
+def get_accu_weather_info(refresh=False):
     city_name, city_url = get_configuration()
-    content = get_page_source(city_url)
-    produce_output(city_name, get_weather_info(content))
+    content = get_page_source(city_url, refresh=refresh)
+    produce_output(city_name, get_weather_info(content, refresh=refresh))
 
 def main(argv):
     """ Main entry point.
@@ -235,6 +235,7 @@ def main(argv):
     
     parser = argparse.ArgumentParser()
     parser.add_argument('command', help='Service name', nargs='?')
+    parser.add_argument('--refresh', help='Update cache', action='store_true')
     params = parser.parse_args(argv)
 
 #    weather_sites = {"AccuWeather": (ACCU_URL, ACCU_TAGS, ACCU_CONTAINER),
@@ -244,7 +245,7 @@ def main(argv):
         command = params.command[:]
 #        print(command)
         if command in KNOWN_COMMANDS:
-             KNOWN_COMMANDS[command]()
+             KNOWN_COMMANDS[command](refresh=params.refresh)
         else:
             print('Unknown command provided!')
             sys.exit(1)
