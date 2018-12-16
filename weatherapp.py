@@ -43,10 +43,15 @@ def get_cache_directory():
     """
     return Path.home() / CACHE_DIR
 
+def get_url_hash(url)
+    """Generates hach for given url
+    """
+    return hashlib.md5(url.encode('utf-8')).hexdigest()
+
 def save_cache(url, page_source):
     """Save page source data to file
     """
-    url_hash = hashlib.md5(url.encode('utf-8')).hexdigest()
+    url_hash = get_url_hash(url)
     cache_dir = get_cache_directory()
     if not cache_dir.exists():
         cache_dir.mkdir(parents=True)
@@ -54,13 +59,23 @@ def save_cache(url, page_source):
         cashe_file.write(page_source)
 
 
+def get_cache(url):
+    """ Return cache data if any.
+    """
+
+    url_hash = get_url_hash(url
+
+
 def get_page_source(url):
     """Use URL and receive requested page decoded by utf-8
     """
-
-    request = Request(url, headers=get_request_headers())
-    page_source = urlopen(request).read()
-    save_cache(url, page_source)
+    cache = get_cache(url)
+    if cache:
+        page_source = cache
+    else:
+        request = Request(url, headers=get_request_headers())
+        page_source = urlopen(request).read()
+        save_cache(url, page_source)
     
     return page_source.decode('utf-8')
 
