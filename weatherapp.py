@@ -4,6 +4,7 @@
 '''
 import sys
 import html
+import time
 import hashlib
 import argparse
 import configparser
@@ -22,6 +23,7 @@ DEFAULT_NAME = 'Kyiv'
 DEFAULT_URL = 'https://www.accuweather.com/uk/ua/kyiv/324505/weather-forecast/324505'
 
 CACHE_DIR = '.wappcache'
+CACHE_TIME = 10
 
 #RP5_URL = ("http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_"
 #           "%D0%B2_%D0%9A%D0%B8%D1%94%D0%B2%D1%96")
@@ -59,6 +61,14 @@ def save_cache(url, page_source):
         cache_file.write(page_source)
 
 
+def is_valid(path):
+    """Check if current cache file is valid.
+    """
+
+    return (time.time() - path.stat().st_mtime) < CACHE_TIME
+    
+     
+
 def get_cache(url):
     """ Return cache data if any.
     """
@@ -68,7 +78,7 @@ def get_cache(url):
     cache_dir = get_cache_directory()
     if cache_dir.exists():
         cache_path = cache_dir / url_hash
-        if cache_path.exists():
+        if cache_path.exists() and is_valid(cache_path):
             with cache_path.open('rb') as cache_file:
                 cache = cache_file.read()
 
