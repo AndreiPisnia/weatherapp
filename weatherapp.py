@@ -4,26 +4,12 @@
 '''
 import sys
 import html
-import time
-import hashlib
 import argparse
-import configparser
-from pathlib import Path
-from bs4 import BeautifulSoup
-from urllib.request import urlopen, Request
 
-ACCU_URL = ("  https://www.accuweather.com/uk/ua/kyiv/324505/weather-forecast/324505")
-ACCU_TAGS = ('<span class="large-temp">', '<span class="cond">')
-ACCU_BROWSE_LOCATIONS = 'https://www.accuweather.com/uk/browse-locations'
+from providers import AccuWeatherProvider
 
-CONFIG_LOCATION = 'Location'
-CONFIG_FILE = 'weatherapp.ini'
 
-DEFAULT_NAME = 'Kyiv'
-DEFAULT_URL = 'https://www.accuweather.com/uk/ua/kyiv/324505/weather-forecast/324505'
 
-CACHE_DIR = '.wappcache'
-CACHE_TIME = 10
 
 #RP5_URL = ("http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_"
 #           "%D0%B2_%D0%9A%D0%B8%D1%94%D0%B2%D1%96")
@@ -35,193 +21,19 @@ CACHE_TIME = 10
 #SINOPTIK_TAGS = ('<p class="today-temp">', 'alt=')
 
 
-def get_request_headers():
-    """
-    """
-    return {'User-Agent': 'Mozila/5.0 (X11; Fedora; Linux x86_64;)'}
-
-def get_cache_directory():
-    """Path to cache directory
-    """
-    return Path.home() / CACHE_DIR
-
-def get_url_hash(url):
-    """Generates hash for given url
-    """
-    return hashlib.md5(url.encode('utf-8')).hexdigest()
-
-def save_cache(url, page_source):
-    """Save page source data to file
-    """
-    url_hash = get_url_hash(url)
-    cache_dir = get_cache_directory()
-    if not cache_dir.exists():
-        cache_dir.mkdir(parents=True)
-    with (cache_dir / url_hash).open('wb') as cache_file:
-        cache_file.write(page_source)
-
-
-def is_valid(path):
-    """Check if current cache file is valid.
-    """
-
-    return (time.time() - path.stat().st_mtime) < CACHE_TIME
-    
-     
-
-def get_cache(url):
-    """ Return cache data if any.
-    """
-
-    cache = b''
-    url_hash = get_url_hash(url)
-    cache_dir = get_cache_directory()
-    if cache_dir.exists():
-        cache_path = cache_dir / url_hash
-        if cache_path.exists() and is_valid(cache_path):
-            with cache_path.open('rb') as cache_file:
-                cache = cache_file.read()
-
-    return cache
-
-def get_page_source(url, refresh=False):
-    """Use URL and receive requested page decoded by utf-8
-    """
-
-    cache = get_cache(url)
-    if cache and not refresh:
-        page_source = cache
-    else:
-        request = Request(url, headers=get_request_headers())
-        page_source = urlopen(request).read()
-        save_cache(url, page_source)
-    
-    return page_source.decode('utf-8')
-
-def get_locations(locations_url, refresh=False):
-    """
-    """
-    locations_page = get_page_source(locations_url, refersh=refresh)
-    soup = BeautifulSoup(locations_page, 'html.parser')
-
-    locations = []
-    for location in soup.find_all('li', class_='drilldown cl'):
-        url = location.find('a').attrs['href']
-        location = location.find('em').text
-        locations.append((location, url))
-    return locations
-
-
-def get_configuration_file():
-    """
-    """
-    return Path.home() / CONFIG_FILE
-
-
-def save_configuration(name, url):
-    """Save selected location to configuration file.
-
-    To save time and not configurate application
-    each time we going to use it.
-
-    :param name: city name
-    :param type: str
-
-    :param url: prefered location URL
-    :param type: str
-    """
-    parser = configparser.ConfigParser()
-    parser[CONFIG_LOCATION] = {'name': name, 'url': url}
-    with open(get_configuration_file(), 'w') as configfile:
-        parser.write(configfile)
-
-
-def get_configuration():
-    """
-    """
-    name = DEFAULT_NAME
-    url =  DEFAULT_URL
-    
-    parser = configparser.ConfigParser()
-    parser.read(get_configuration_file())
-
-    if CONFIG_LOCATION in parser.sections():
-        config = parser[CONFIG_LOCATION]
-        name, url = config['name'], config['url']
-    return name, url
-
-    
-def configurate(refresh=False):
-    """
-    """
-    locations = get_locations(ACCU_BROWSE_LOCATIONS, refresh=refresh)
-    while locations:
-        for index, location in enumerate(locations):
-            print(f'{index + 1}. {location[0]}')
-        selected_index = int(input('Please select location: '))
-        location = locations[selected_index - 1]
-        locations = get_locations(location[1], refresh=refresh)
-
-    save_configuration(*location)
-
-def get_weather_info(page_content, refresh=False):
-    """
-    """
-#    import pdb; pdb.set_trace()
-    city_page = BeautifulSoup(page_content, 'html.parser')
-    current_day_section = city_page.find(
-        'li', class_='night current first cl')
-
-    weather_info = {}
-    if current_day_section:
-        current_day_url = current_day_section.find('a').attrs['href']
-        if current_day_url:
-            current_day_page = get_page_source(current_day_url, refresh=refresh)
-            if current_day_page:
-                current_day = \
-                        BeautifulSoup(current_day_page, 'html.parser')
-                weather_details = \
-                        current_day.find('div', attrs={'id': 'detail-now'})
-                condition = weather_details.find('span', class_='cond')
-                if condition:
-                    weather_info['cond'] = condition.text
-                temp = weather_details.find('span', class_='large-temp')
-                if temp:
-                    weather_info['temp'] = temp.text
-                feal_temp = weather_details.find('span', class_='small-temp')
-                if feal_temp:
-                    weather_info['feal_temp'] = feal_temp.text
-                wind_info = weather_details.find_all('li', class_='wind')
-                if wind_info:
-                    weather_info['wind'] = \
-                            ' '.join(map(lambda t: t.text.strip(), wind_info))
-
-    return weather_info
-
 def produce_output(city_name, info):
     """
     """
-    file = open('weather.txt', 'w')
-    file.write('Accu Weather: \n')
-    file.write(f'{city_name} \n')
-    
     print('Accu Weather: \n')
     print(f'{city_name}')
     print('_'*20)
 
     for key, value in info.items():
         print(f'{key}: {html.unescape(value)}')
-        file.write(f'{key}: {html.unescape(value)} \n')
-        
-
-#    print(f'\n{provider_name}')
-#    print(f'Temperature: {html.unescape(temp)}')
-#    print(f'Condition: {condition} \n')
-            
+          
 def get_accu_weather_info(refresh=False):
-    city_name, city_url = get_configuration()
-    content = get_page_source(city_url, refresh=refresh)
-    produce_output(city_name, get_weather_info(content, refresh=refresh))
+    accu = AccuWeatherProvider()
+    produce_output(accu.location, accu.run(refresh=refresh))
 
 def main(argv):
     """ Main entry point.
@@ -230,8 +42,8 @@ def main(argv):
 #    print(argv)
 #    sys.exit(0)
 
-    KNOWN_COMMANDS = {'accu': get_accu_weather_info,
-                      'config': configurate}
+    KNOWN_COMMANDS = {'accu': get_accu_weather_info}#,
+#                      'config': configurate}
     
     parser = argparse.ArgumentParser()
     parser.add_argument('command', help='Service name', nargs='?')
