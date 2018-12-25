@@ -14,8 +14,15 @@ class AccuWeatherProvider:
     """Weather provider for Accuweather site.
     """
 
+    name = config.ACCU_PROVIDER_NAME
+    title = config.ACCU_PROVIDER_TITLE
+
+    default_location = config.ACCU_DEFAULT_LOCATION_NAME
+    default_url = config.ACCU_DEFAULT_LOCATION_URL
+
+    
     def __init__(self):
-        self.name = config.ACCU_PROVIDER_NAME
+        self.app = app
 
         location, url = self.get_configuration()
         self.location = location
@@ -40,12 +47,11 @@ class AccuWeatherProvider:
         :rtype: tuple
         """
 
-        name = config.ACCU_DEFAULT_NAME
-        url = config.ACCU_DEFAULT_URL
-        
+        name = self.default_location
+        url = self.default_url
         configuration = configparser.ConfigParser()
+        
         configuration.read(self.get_configuration_file())
-
         if config.CONFIG_LOCATION in configuration.sections():
             location_config = configuration[config.CONFIG_LOCATION]
             name, url = location_config['name'], location_config['url']
@@ -92,8 +98,7 @@ class AccuWeatherProvider:
         """
 
         return (time.time() - path.stat().st_mtime) < config.CACHE_TIME
-        
-         
+                 
 
     def get_cache(self, url):
         """ Return cache data if any.
@@ -208,8 +213,15 @@ class Rp5WeatherProvider:
     """Weather provider for Rp5 site.
     """
 
-    def __init__(self):
-        self.name = config.RP5_PROVIDER_NAME
+    name = config.RP5_PROVIDER_NAME
+    title = config.RP5_PROVIDER_TITLE
+
+    default_location = config.RP5_DEFAULT_LOCATION_NAME
+    default_url = config.RP5_DEFAULT_LOCATION_URL
+
+
+    def __init__(self, app):
+        self.app = app
 
         location, url = self.get_configuration()
         self.location = location
@@ -231,16 +243,16 @@ class Rp5WeatherProvider:
         :rtype: tuple
         """
 
-        name = config.RP5_DEFAULT_NAME
-        url = config.RP5_DEFAULT_URL
+        name = self.default_location
+        url = self.default_url
         
 #       configuration does not work. error in codding html path in weatherapp.ini.
 #       I am still working on this problem.
 #       Use default location and url.
 
 #        configuration = configparser.ConfigParser()
-#        configuration.read(self.get_configuration_file())
 
+#        configuration.read(self.get_configuration_file())
 #        if config.CONFIG_LOCATION in configuration.sections():
 #            location_config = configuration[config.CONFIG_LOCATION]
 #            name, url = location_config['name'], location_config['url']
@@ -288,7 +300,6 @@ class Rp5WeatherProvider:
 
         return (time.time() - path.stat().st_mtime) < config.CACHE_TIME
         
-         
 
     def get_cache(self, url):
         """ Return cache data if any.
