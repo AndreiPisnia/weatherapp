@@ -7,6 +7,7 @@ import html
 import argparse
 
 from providers import AccuWeatherProvider
+from providers import Rp5WeatherProvider
 
 
 
@@ -21,19 +22,35 @@ from providers import AccuWeatherProvider
 #SINOPTIK_TAGS = ('<p class="today-temp">', 'alt=')
 
 
-def produce_output(city_name, info):
+def produce_accu_output(city_name, info):
     """
     """
     print('Accu Weather: \n')
     print(f'{city_name}')
     print('_'*20)
-
+    
     for key, value in info.items():
         print(f'{key}: {html.unescape(value)}')
-          
+         
 def get_accu_weather_info(refresh=False):
     accu = AccuWeatherProvider()
-    produce_output(accu.location, accu.run(refresh=refresh))
+    produce_accu_output(accu.location, accu.run(refresh=refresh))
+
+def produce_rp5_output(city_name, info):
+    """
+    """
+    print('Rp5 Weather: \n')
+    print(f'{city_name}')
+    print('_'*20)
+    
+    for key, value in info.items():
+        print(f'{key}: {html.unescape(value)}')
+    
+
+def get_rp5_weather_info(refresh=False):
+    rp5 = Rp5WeatherProvider()
+    produce_rp5_output(rp5.location, rp5.run(refresh=refresh))
+    
 
 def main(argv):
     """ Main entry point.
@@ -42,7 +59,8 @@ def main(argv):
 #    print(argv)
 #    sys.exit(0)
 
-    KNOWN_COMMANDS = {'accu': get_accu_weather_info}#,
+    KNOWN_COMMANDS = {'accu': get_accu_weather_info,
+                      'rp5': get_rp5_weather_info}#,
 #                      'config': configurate}
     
     parser = argparse.ArgumentParser()
