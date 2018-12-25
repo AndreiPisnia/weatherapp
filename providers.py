@@ -1,3 +1,6 @@
+"""Weather providers.
+"""
+
 import re
 import time
 import hashlib
@@ -10,18 +13,11 @@ from bs4 import BeautifulSoup
 import config
 
 
-class AccuWeatherProvider:
-    """Weather provider for Accuweather site.
+class WeatherProvider:
+    """Base weather provider
     """
 
-    name = config.ACCU_PROVIDER_NAME
-    title = config.ACCU_PROVIDER_TITLE
-
-    default_location = config.ACCU_DEFAULT_LOCATION_NAME
-    default_url = config.ACCU_DEFAULT_LOCATION_URL
-
-    
-    def __init__(self):
+    def __init__(self, app):
         self.app = app
 
         location, url = self.get_configuration()
@@ -123,7 +119,7 @@ class AccuWeatherProvider:
             cache_dir.mkdir(parents=True)
         with (cache_dir / self.get_url_hash(url)).open('wb') as cache_file:
             cache_file.write(page_source)
-    
+
 
     def get_page_source(self, url, refresh=False):
         """Use URL and receive requested page decoded by utf-8
@@ -140,6 +136,23 @@ class AccuWeatherProvider:
         
         return page_source.decode('utf-8')
 
+
+    def run(self, refresh=False):
+        content = self.get_page_source(self.url, refresh=refresh)
+        return self.get_weather_info(content, refresh=refresh)
+
+
+class AccuWeatherProvider(WeatherProvider):
+    """Weather provider for Accuweather site.
+    """
+
+    name = config.ACCU_PROVIDER_NAME
+    title = config.ACCU_PROVIDER_TITLE
+
+    default_location = config.ACCU_DEFAULT_LOCATION_NAME
+    default_url = config.ACCU_DEFAULT_LOCATION_URL
+
+    
     def get_locations(self, locations_url, refresh=False):
         """
         """
@@ -203,13 +216,9 @@ class AccuWeatherProvider:
 
         return weather_info
 
-    def run(self, refresh=False):
-        content = self.get_page_source(self.url, refresh=refresh)
-        return self.get_weather_info(content, refresh=refresh)
-
 #_____________________________________________________________________________
 
-class Rp5WeatherProvider:
+class Rp5WeatherProvider(WeatherProvider):
     """Weather provider for Rp5 site.
     """
 
@@ -220,140 +229,11 @@ class Rp5WeatherProvider:
     default_url = config.RP5_DEFAULT_LOCATION_URL
 
 
-    def __init__(self, app):
-        self.app = app
+    def get_countries():
+        pass
 
-        location, url = self.get_configuration()
-        self.location = location
-        self.url = url
-
-
-    def get_configuration_file(self):
-        """Path to configuration file
-
-        Returns path to configuration file in home directory
-        """
-        return Path.home() / config.CONFIG_FILE
-
-
-    def get_configuration(self):
-        """Returns configured location, name and url.
-
-        :return: city name and url
-        :rtype: tuple
-        """
-
-        name = self.default_location
-        url = self.default_url
-        
-#       configuration does not work. error in codding html path in weatherapp.ini.
-#       I am still working on this problem.
-#       Use default location and url.
-
-#        configuration = configparser.ConfigParser()
-
-#        configuration.read(self.get_configuration_file())
-#        if config.CONFIG_LOCATION in configuration.sections():
-#            location_config = configuration[config.CONFIG_LOCATION]
-#            name, url = location_config['name'], location_config['url']
-        return name, url
-
-
-    def save_configuration(self, name, url):
-        """Save selected location to configuration file.
-
-        To save time and not configurate application
-        each time we going to use it.
-
-        :param name: city name
-        :param type: str
-
-        :param url: prefered location URL
-        :param type: str
-        """
-        parser = configparser.ConfigParser()
-        parser[config.CONFIG_LOCATION] = {'name': name, 'url': url}
-        with open(self.get_configuration_file(), 'w') as configfile:
-            parser.write(configfile)
-
-
-    def get_request_headers(self):
-        """Returns custom headers to url requests.
-        """
-        return {'User-Agent': config.FAKE_MOZILA_AGENT}
-
-
-    def get_url_hash(self, url):
-        """Generates hash for given url
-        """
-        return hashlib.md5(url.encode('utf-8')).hexdigest()
-
-    def get_cache_directory(self):
-        """Path to cache directory
-        """
-        return Path.home() / config.CACHE_DIR
-
-
-    def is_valid(self, path):
-        """Check if current cache file is valid.
-        """
-
-        return (time.time() - path.stat().st_mtime) < config.CACHE_TIME
-        
-
-    def get_cache(self, url):
-        """ Return cache data if any.
-        """
-
-        cache = b''
-        cache_dir = self.get_cache_directory()
-        if cache_dir.exists():
-            cache_path = cache_dir / self.get_url_hash(url)
-            if cache_path.exists() and self.is_valid(cache_path):
-                with cache_path.open('rb') as cache_file:
-                    cache = cache_file.read()
-
-        return cache
-
-
-    def save_cache(self, url, page_source):
-        """Save page source data to file
-        """
-        cache_dir = self.get_cache_directory()
-        if not cache_dir.exists():
-            cache_dir.mkdir(parents=True)
-        with (cache_dir / self.get_url_hash(url)).open('wb') as cache_file:
-            cache_file.write(page_source)
-    
-
-    def get_page_source(self, url, refresh=False):
-        """Use URL and receive requested page decoded by utf-8
-        """
-
-        cache = self.get_cache(url)
-        if cache and not refresh:
-            page_source = cache
-
-        else:
-            request = Request(url, headers=self.get_request_headers())
-            page_source = urlopen(request).read()
-            self.save_cache(url, page_source)
-        
-        return page_source.decode('utf-8')
-
-    def get_locations(self, locations_url, refresh=False):
-        """
-        """
-        locations_page = self.get_page_source(locations_url, refersh=refresh)
-        soup = BeautifulSoup(locations_page, 'html.parser')
-
-        locations = []
-        for location in soup.find_all('li', class_='drilldown cl'):
-            url = location.find('a').attrs['href']
-            location = location.find('em').text
-            locations.append((location, url))
-        return locations
-
+    def get_cities():
+        pass
 
     def configurate(self, refresh=False):
         """
@@ -392,10 +272,3 @@ class Rp5WeatherProvider:
 #        print(weather_info)
 
         return weather_info
-
-
-
-    def run(self, refresh=False):
-        content = self.get_page_source(self.url, refresh=refresh)
-        return self.get_weather_info(content, refresh=refresh)
-
