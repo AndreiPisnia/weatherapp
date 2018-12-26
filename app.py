@@ -1,8 +1,13 @@
+#!/usr/bin/env python
+
+
 """Main application module
 """
 
 import sys
 from argparse import ArgumentParser
+
+from providermanager import ProviderManager
 
 
 class App:
@@ -10,10 +15,11 @@ class App:
     """
 
     def __init__(self):
-        self.arg_parser =
+        self.arg_parser = self._arg_parse()
+        self.providermanager = ProviderManager()
 
 
-    def _arg_parser(self):
+    def _arg_parse(self):
         """Initialize argument parser
         """
         
@@ -48,12 +54,20 @@ class App:
 
         if not command_name:
             # run all weather providers by default
-            pass
-        elif command_name in {}:
+            for name, provider in self.providermanager._providers.items():
+                provider_obj = provider(self)
+                self.produce_output(provider_obj.title,
+                               provider_obj.location,
+                               provider_obj.run())
+            
+        elif command_name in self.providermanager:
             # run specified provider
-            pass
-
-
+            provider = self.providermanager[command_name]
+            provider_obj = provider(self)
+            self.produce_output(provider_obj.title,
+                           provider_obj.location,
+                           provider_obj.run())
+            
 def main(argv=sys.argv[1:]):
     """Main entry point
     """

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """Weather providers.
 """
 
@@ -16,7 +18,6 @@ import config
 class WeatherProvider:
     """Base weather provider
     """
-
     def __init__(self, app):
         self.app = app
 
@@ -124,7 +125,6 @@ class WeatherProvider:
     def get_page_source(self, url, refresh=False):
         """Use URL and receive requested page decoded by utf-8
         """
-
         cache = self.get_cache(url)
         if cache and not refresh:
             page_source = cache
@@ -184,7 +184,6 @@ class AccuWeatherProvider(WeatherProvider):
     def get_weather_info(self, page_content, refresh=False):
         """
         """
-    #    import pdb; pdb.set_trace()
         city_page = BeautifulSoup(page_content, 'html.parser')
         current_day_section = city_page.find(
             'li', class_=re.compile('(day|night) current first cl'))
@@ -221,7 +220,6 @@ class AccuWeatherProvider(WeatherProvider):
 class Rp5WeatherProvider(WeatherProvider):
     """Weather provider for Rp5 site.
     """
-
     name = config.RP5_PROVIDER_NAME
     title = config.RP5_PROVIDER_TITLE
 
@@ -257,12 +255,9 @@ class Rp5WeatherProvider(WeatherProvider):
 #           Still working on this. 
 
 
-#       import pdb; pdb.set_trace()
         city_page = BeautifulSoup(page_content, 'html.parser')
         current_day_section = city_page.find(
             'div', class_="ArchiveInfo")
-
-#        print(current_day_section)
 
         weather_info = {}
         temp = current_day_section.find('span', class_="t_0")
