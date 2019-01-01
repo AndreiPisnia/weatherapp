@@ -12,6 +12,7 @@ from urllib.request import Request, urlopen
 
 from bs4 import BeautifulSoup
 
+import decorators
 import config
 
 
@@ -136,7 +137,7 @@ class WeatherProvider:
         
         return page_source.decode('utf-8')
 
-
+    @decorators.one_moment
     def run(self, refresh=False):
         content = self.get_page_source(self.url, refresh=refresh)
         return self.get_weather_info(content, refresh=refresh)
