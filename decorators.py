@@ -18,3 +18,15 @@ def slow_down(sec=1):
             return func(*args, **kwargs)
         return wrapper
     return one_moment
+
+
+def timer(func):
+    """Print the runtime of the decorated function"""
+    def wrapper(*args, **kwargs):
+        print('-' * 20)
+        start_time = time.perf_counter()
+        result = func(*args, **kwargs)
+        run_time = time.perf_counter() - start_time
+        print(f"finished running {func.__name__!r} in {run_time:.4f} seconds")
+        return result
+    return wrapper
