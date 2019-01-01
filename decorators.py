@@ -21,7 +21,7 @@ def slow_down(sec=1):
 
 
 def timer(func):
-    """Print the runtime of the decorated function"""
+    """Measure and print the runtime of the decorated function"""
     def wrapper(*args, **kwargs):
         print('-' * 20)
         start_time = time.perf_counter()
