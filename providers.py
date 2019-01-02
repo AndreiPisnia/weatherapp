@@ -128,7 +128,8 @@ class WeatherProvider:
             cache_file.write(page_source)
 
 
-    @decorators.timer
+    @decorators.print_args
+#    @decorators.timer
     def get_page_source(self, url, refresh=False):
         """Use URL and receive requested page decoded by utf-8
         """
@@ -144,6 +145,7 @@ class WeatherProvider:
         return page_source.decode('utf-8')
 
 
+#    @decorators.print_args
     @decorators.timer
     def run(self, refresh=False):
         content = self.get_page_source(self.url, refresh=refresh)
