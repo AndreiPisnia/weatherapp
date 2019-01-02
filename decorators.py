@@ -30,3 +30,15 @@ def timer(func):
         print(f"finished running {func.__name__!r} in {run_time:.4f} seconds")
         return result
     return wrapper
+
+
+def print_args(func):
+    """Print arguments of the decorated function"""
+    def wrapper(*args, **kwargs):
+        print(f'For function {func}')
+        print('args:\n', args)
+        print('kwargs:\n', kwargs)
+        print('_' * 50)
+        result = func(*args, **kwargs)
+        return result
+    return wrapper
