@@ -58,7 +58,7 @@ class App:
                 provider_obj = provider(self)
                 self.produce_output(provider_obj.title,
                                provider_obj.location,
-                               provider_obj.run())
+                               provider_obj.run(remaining_args))
             
         elif command_name in self.providermanager:
             # run specified provider
@@ -66,7 +66,7 @@ class App:
             provider_obj = provider(self)
             self.produce_output(provider_obj.title,
                            provider_obj.location,
-                           provider_obj.run())
+                           provider_obj.run(remaining_args))
             
 def main(argv=sys.argv[1:]):
     """Main entry point
