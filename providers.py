@@ -116,43 +116,79 @@ class Rp5WeatherProvider(WeatherProvider):
     def get_default_url(self):
         return config.RP5_DEFAULT_LOCATION_URL
 
-    def get_countries():
-        pass
-
-    def get_cities():
-        pass
+    def get_countries(self, countries_url):
+        countries_page = self.get_page_source(countries_url)
+        soup = BeautifulSoup(countries_page, 'html.parser')
+        base = urllib.parse.urlunsplit(
+            urllib.parse.urlparse(countries_url)[:2] + ('/', '', ''))
+        countries = []
+        for country in soup.find_all('div', class_='country_map_links'):
+            url = urllib.parse.urljoin(base, country.find('a').attrs['href'])
+            country = country.find('a').text
+            
+    def get_cities(self, country_url):
+        cities_page = self.get.page.source(country_url)
+        soup = BeautifulSoup(country_page, 'html.parser')
+        base = urllib.parse.urlunsplit(
+            urllib.parse.urlparse(country_url)[:2] + ('/', '', ''))
+        country_map = soup.find('div', class_='countryMap')
+        if country_map:
+            cities_list = country_map.find_all('h3')
+            for city in cities_list:
+                url = urllib.parse.urljoin(base, city.find('a').attrs['href'])
+                city = city.find('a').text
+                cities.append((city, url))
+        return cities
 
     def configurate(self, refresh=False):
+        """Configure provider.
         """
-        """
-        locations = self.get_locations(config.RP5_BROWSE_LOCATIONS, refresh=refresh)
-        while locations:
-            for index, location in enumerate(locations):
-                print(f'{index + 1}. {location[0]}')
-            selected_index = int(input('Please select location: '))
-            location = locations[selected_index - 1]
-            locations = self.get_locations(location[1], refresh=refresh)
+        countries = self.get_countries(config.RP5_BROWSE_LOCATIONS, refresh=refresh)
+        for index, country in enumerate(countries):
+            print(f'{index + 1}. {country[0]}\n')
+        selected_index = int(input('Please select country: '))
+        country = countries[selected_index - 1]
 
-        self.save_configuration(*location)
+        cities = self.get_cities(country[1])
+        for index, city in enumerate(cities):
+            print(f'{index + 1}. {city[0]}')
+        selected_index = int(input('Please select city: '))
+        city = cities[selected_index - 1]
+#        locations = self.get_locations(location[1], refresh=refresh)
+
+        self.save_configuration(*city)
 
 
     def get_weather_info(self, page_content, refresh=False):
+        """Get weather information
         """
-        """
-#           This function is not ready yet.
-#           Problem with getting information from site Rp5.
-#           Still working on this. 
-
 
         city_page = BeautifulSoup(page_content, 'html.parser')
-        current_day_section = city_page.find(
-            'div', class_="ArchiveInfo")
+        current_day = city_page.find('div', id="archiveString")
+#        current_day = city_page.find('div', class_="ArchiveInfo")
 
-        weather_info = {}
-        temp = current_day_section.find('span', class_="t_0")
+        weather_info = {'cond': '', 'temp': '', 'feal_temp': '', 'wind': ''}
+
+        archive_text = current_day.text
+        info_list = archive_text.split(',')
+        weather_info['cond'] = info_list[1].strip()
+        
+        temp = current_day.find('span', class_="t_0")
         weather_info['temp'] = temp.text
-     
-        weather_info['cond'] = current_day_section.text
-#        print(weather_info)
+        
+#        if current_day:
+#            import pdb; pdb.set_trace()
+#            archive_info = current_day.find('div', class_="ArchiveInfo")
+#            if archive_info:
+#                archive_text = archive_info.text
+#                info_list = archive_text.split(',')
+#                weather_info['cond'] = info_list[1].strip()
+#                temp = archive_info.find('span', class_='t=0')
+#                if temp:
+#                    weather_info['temp'] = temp.text
+#                wind = info_list[3].strip()[:info_list[3].find(')')]
+#                wind += info_list[4]
+#                if wind:
+#                    weather_info['wind'] = wind
 
         return weather_info

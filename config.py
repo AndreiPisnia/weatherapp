@@ -23,8 +23,8 @@ RP5_PROVIDER_TITLE = 'Rp5.ua'
 RP5_URL = ("http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_%D0%B2_%D0%9A%D0%B8%D1%94%D0%B2%D1%96")
 RP5_CONTAINER = ('<div class="ArchiveInfo" style="width:80%;">')          
 RP5_TAGS = ('<span class="t_0" style="">', ' °F</span>, ')
-RP5_BROWSE_LOCATIONS = ("http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_"
-                        "%D0%B2_%D1%81%D0%B2%D1%96%D1%82%D1%96")
+RP5_BROWSE_LOCATIONS = ("http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0"
+                        "_%D0%B2_%D1%81%D0%B2%D1%96%D1%82%D1%96")
 
 RP5_DEFAULT_LOCATION_NAME = 'Kyiv'
 RP5_DEFAULT_LOCATION_URL = ("http://rp5.ua/%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_"

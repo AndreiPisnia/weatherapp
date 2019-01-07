@@ -8,7 +8,7 @@ import configparser
 from pathlib import Path
 from urllib.request import Request, urlopen
 
-import request
+import requests
 
 import config
 import decorators
@@ -53,6 +53,11 @@ class WeatherProvider(Command):
         location, url = self.get_configuration()
         self.location = location
         self.url = url
+
+    @abc.abstractmethod
+    def get_name(self):
+        """Provider name
+        """
 
     @abc.abstractmethod
     def get_default_location(self):
