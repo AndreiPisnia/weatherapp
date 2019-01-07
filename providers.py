@@ -8,8 +8,9 @@ import urllib
 
 from bs4 import BeautifulSoup
 
-import decorators
 import config
+import decorators
+
 from abstract import WeatherProvider
 
 
@@ -23,6 +24,15 @@ class AccuWeatherProvider(WeatherProvider):
     default_location = config.ACCU_DEFAULT_LOCATION_NAME
     default_url = config.ACCU_DEFAULT_LOCATION_URL
 
+    def get_default_location(self):
+        return config.ACCU_DEFAULT_LOCATION_NAME
+
+    def get_default_url(self):
+        return config.ACCU_DEFAULT_LOCATION_URL
+
+
+    def get_name(self):
+        return self.name
     
     def get_locations(self, locations_url, refresh=False):
         """
@@ -94,9 +104,17 @@ class Rp5WeatherProvider(WeatherProvider):
     name = config.RP5_PROVIDER_NAME
     title = config.RP5_PROVIDER_TITLE
 
+    def get_name(self):
+        return self.name
+
     default_location = config.RP5_DEFAULT_LOCATION_NAME
     default_url = config.RP5_DEFAULT_LOCATION_URL
 
+    def get_default_location(self):
+        return config.RP5_DEFAULT_LOCATION_NAME
+
+    def get_default_url(self):
+        return config.RP5_DEFAULT_LOCATION_URL
 
     def get_countries():
         pass

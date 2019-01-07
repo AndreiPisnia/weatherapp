@@ -8,6 +8,8 @@ import configparser
 from pathlib import Path
 from urllib.request import Request, urlopen
 
+import request
+
 import config
 import decorators
 
@@ -52,16 +54,15 @@ class WeatherProvider(Command):
         self.location = location
         self.url = url
 
-#    @abc.abstractmethod
-#    def get_default_location(self):
-#        """Default location name
-#        """
-#
-#    @abc.abstractmethod
-#    def get_default_url(self):
-#        """Default location url
-#        """
+    @abc.abstractmethod
+    def get_default_location(self):
+        """Default location name
+        """
 
+    @abc.abstractmethod
+    def get_default_url(self):
+        """Default location url
+        """
 
     @abc.abstractmethod
     def configurate(self):
@@ -102,13 +103,13 @@ class WeatherProvider(Command):
         :rtype: tuple
         """
 
-        name = self.default_location
-        url = self.default_url
+        name = self.get_default_location()
+        url = self.get_default_url()
         configuration = configparser.ConfigParser()
         
         configuration.read(self.get_configuration_file())
-        if config.CONFIG_LOCATION in configuration.sections():
-            location_config = configuration[config.CONFIG_LOCATION]
+        if self.get_name() in configuration.sections():
+            location_config = configuration[self.get_name()]
             name, url = location_config['name'], location_config['url']
         return name, url
 
@@ -126,8 +127,13 @@ class WeatherProvider(Command):
         :param type: str
         """
         parser = configparser.ConfigParser()
-        parser[config.CONFIG_LOCATION] = {'name': name, 'url': url}
-        with open(self.get_configuration_file(), 'w') as configfile:
+        config_file = self.get_configuration_file()
+
+        if config_file.exists():
+            parser.read(config_file)
+
+        parser[self.get_name()] = {'name': name, 'url': url}
+        with open(config_file, 'w') as configfile:
             parser.write(configfile)
 
 
@@ -191,12 +197,13 @@ class WeatherProvider(Command):
         """Use URL and receive requested page decoded by utf-8
         """
         cache = self.get_cache(url)
-        if cache and not refresh:
+        if cache and not self.app.options.refresh:
             page_source = cache
 #            print(f'Cache for {url}')
         else:
             request = Request(url, headers=self.get_request_headers())
             page_source = urlopen(request).read()
+            
             self.save_cache(url, page_source)
         
         return page_source.decode('utf-8')
