@@ -30,14 +30,13 @@ class AccuWeatherProvider(WeatherProvider):
     def get_default_url(self):
         return config.ACCU_DEFAULT_LOCATION_URL
 
-
     def get_name(self):
         return self.name
     
     def get_locations(self, locations_url, refresh=False):
         """
         """
-        locations_page = self.get_page_source(locations_url, refersh=refresh)
+        locations_page = self.get_page_source(locations_url, refresh=refresh)
         soup = BeautifulSoup(locations_page, 'html.parser')
 
         locations = []
@@ -116,7 +115,7 @@ class Rp5WeatherProvider(WeatherProvider):
     def get_default_url(self):
         return config.RP5_DEFAULT_LOCATION_URL
 
-    def get_countries(self, countries_url):
+    def get_countries(self, countries_url, refresh=False):
         countries_page = self.get_page_source(countries_url)
         soup = BeautifulSoup(countries_page, 'html.parser')
         base = urllib.parse.urlunsplit(
@@ -125,10 +124,13 @@ class Rp5WeatherProvider(WeatherProvider):
         for country in soup.find_all('div', class_='country_map_links'):
             url = urllib.parse.urljoin(base, country.find('a').attrs['href'])
             country = country.find('a').text
+            countries.append((country, url))
+        return countries
             
     def get_cities(self, country_url):
-        cities_page = self.get.page.source(country_url)
-        soup = BeautifulSoup(country_page, 'html.parser')
+        cities = []
+        cities_page = self.get_page_source(country_url)
+        soup = BeautifulSoup(cities_page, 'html.parser')
         base = urllib.parse.urlunsplit(
             urllib.parse.urlparse(country_url)[:2] + ('/', '', ''))
         country_map = soup.find('div', class_='countryMap')
