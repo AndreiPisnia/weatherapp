@@ -81,8 +81,11 @@ class App:
 def main(argv=sys.argv[1:]):
     """Main entry point
     """
-
-    return App().run(argv)
+    try:
+        return App().run(argv)
+    except:
+        print("An error ocured. Programm stopped running. "
+              "Please contact developer.")
 
 
 if __name__ == '__main__':
