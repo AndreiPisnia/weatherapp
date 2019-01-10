@@ -54,8 +54,19 @@ class AccuWeatherProvider(WeatherProvider):
         while locations:
             for index, location in enumerate(locations):
                 print(f'{index + 1}. {location[0]}')
-            selected_index = int(input('Please select location: '))
-            location = locations[selected_index - 1]
+            try:
+                selected_index = int(input('Please select location: '))
+            except ValueError:
+                print ("Wrong choice. "
+                       "Please restart configuration and input the number.")
+                break
+                
+            try:
+                location = locations[selected_index - 1]
+            except (IndexError, ValueError):
+                print (f"Wrong choice: {selected_index}. "
+                       "Please make wright selection.")
+                break
             locations = self.get_locations(location[1], refresh=refresh)
 
         self.save_configuration(*location)
@@ -148,14 +159,36 @@ class Rp5WeatherProvider(WeatherProvider):
         countries = self.get_countries(config.RP5_BROWSE_LOCATIONS, refresh=refresh)
         for index, country in enumerate(countries):
             print(f'{index + 1}. {country[0]}\n')
-        selected_index = int(input('Please select country: '))
-        country = countries[selected_index - 1]
+        try:
+            selected_index = int(input('Please select country: '))
+        except ValueError:
+            print("Wrong choice."
+                  "Please restart configuration and input the number.")
+            exit()
+
+        try:
+            country = countries[selected_index - 1]
+        except IndexError:
+            print(f"Wrong choice: {selected_index}. "
+                  "Please make wright selection.")
+            exit()
 
         cities = self.get_cities(country[1])
         for index, city in enumerate(cities):
             print(f'{index + 1}. {city[0]}')
-        selected_index = int(input('Please select city: '))
-        city = cities[selected_index - 1]
+        try:
+            selected_index = int(input('Please select city: '))
+        except ValueError:
+            print("Wrong choice."
+                  "Please restart configuration and input the number.")
+            exit()
+        try:
+            city = cities[selected_index - 1]
+        except IndexError:
+            print(f"Wrong choice: {selected_index}. "
+                  "Please make wright selection.")
+            exit()
+            
 #        locations = self.get_locations(location[1], refresh=refresh)
 
         self.save_configuration(*city)
