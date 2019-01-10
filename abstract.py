@@ -111,8 +111,13 @@ class WeatherProvider(Command):
         name = self.get_default_location()
         url = self.get_default_url()
         configuration = configparser.ConfigParser()
+
+        try:
+            configuration.read(self.get_configuration_file())
+        except configparser.Error:
+            print((f"Wrong configuration file. "
+                  f"Please reconfigurate your provider: {self.name}"))
         
-        configuration.read(self.get_configuration_file())
         if self.get_name() in configuration.sections():
             location_config = configuration[self.get_name()]
             name, url = location_config['name'], location_config['url']
