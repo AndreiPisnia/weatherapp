@@ -29,6 +29,10 @@ class App:
         arg_parser.add_argument('command', help="Command", nargs='?')
         arg_parser.add_argument('--refresh', help="Bypass caches",
                                 action='store_true')
+        arg_parser.add_argument('--debug',
+                                action='store_true',
+                                default=False,
+                                help="Bypass catching errors")
         return arg_parser
 
 
@@ -61,19 +65,13 @@ class App:
         if not command_name:
             # run all weather providers by default
             for name, provider in self.providermanager._providers.items():
-#                provider_obj = provider(self)
                 self.produce_output(provider.title,
                                provider(self).location,
                                provider(self).run(remaining_args))
-
-#                self.produce_output(provider_obj.title,
-#                               provider_obj.location,
-#                               provider_obj.run(remaining_args))
             
         elif command_name in self.providermanager:
             # run specified provider
             provider = self.providermanager[command_name](self)
-#            provider_obj = provider(self)
             self.produce_output(provider.title,
                            provider.location,
                            provider.run(remaining_args))
@@ -81,11 +79,15 @@ class App:
 def main(argv=sys.argv[1:]):
     """Main entry point
     """
-    try:
+    if argv and argv[0]=='--debug':
         return App().run(argv)
-    except:
-        print("An error ocured. Programm stopped running. "
-              "Please contact developer.")
+    else:
+        try:
+            return App().run(argv)
+        except:
+            print("An error ocured. Programm stopped running. "
+                  "Please contact developer.")
+
 
 
 if __name__ == '__main__':
