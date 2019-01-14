@@ -1,3 +1,8 @@
+#apppication default verbose and log levels
+DEFAULT_VERBOSE_LEVEL = 0
+DEFAULT_MESSAGE_FORMAT = '%(message)S'
+
+
 CONFIG_LOCATION = 'Location'
 CONFIG_FILE = 'weatherapp.ini'
 

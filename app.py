@@ -5,15 +5,23 @@
 """
 
 import sys
+import logging
 from argparse import ArgumentParser
 
 from commandmanager import CommandManager
 from providermanager import ProviderManager
 
+import config
+
 
 class App:
     """  Weather agregator application.
     """
+
+    logger = logging.getLogger(__name__)
+    LOG_LEVEL_MAP = {0: logging.WARNING,
+                     1: logging.INFO,
+                     2: logging.DEBUG}
 
     def __init__(self):
         self.arg_parser = self._arg_parse()
@@ -33,9 +41,28 @@ class App:
                                 action='store_true',
                                 default=False,
                                 help="Bypass catching errors")
+        arg_parser.add_argument('-v', '--verbose',
+                                action='count',
+                                dest='verbose_level',
+                                default=config.DEFAULT_VERBOSE_LEVEL,
+                                help='Increase verbosity of output.')
         return arg_parser
 
+    def configure_logging(self):
+        """Create logging handlers for any log output.
+        """
+        
+        root_logger = logging.getLogger('')
+        root_logger.setLevel(logging.DEBUG)
 
+        console = logging.StreamHandler()
+        console_level = self.LOG_LEVEL_MAP.get(self.options.verbose_level,
+                                               logging.WARNING)
+        console.setLevel(console_level)
+        formatter = logging.Formatter(config.DEFAULT_MESSAGE_FORMAT)
+        console.setFormatter(formatter)
+        root_logger.addHandler(console)
+        
     def produce_output(self, title, location, info):
         """Print results.
         """
@@ -56,6 +83,8 @@ class App:
         :parm argv: list of passed arguments
         """
         self.options, remaining_args = self.arg_parser.parse_known_args(argv)
+        self.configure_logging()
+        self.logger.debug('Got the following args %s', argv)
         command_name = self.options.command
 
         if command_name in self.commandmanager:
@@ -79,14 +108,14 @@ class App:
 def main(argv=sys.argv[1:]):
     """Main entry point
     """
-    if argv and argv[0]=='--debug':
-        return App().run(argv)
-    else:
-        try:
-            return App().run(argv)
-        except:
-            print("An error ocured. Programm stopped running. "
-                  "Please contact developer.")
+#    if argv and argv[0]=='--debug':
+    return App().run(argv)
+#    else:
+#        try:
+#            return App().run(argv)
+#        except:
+#            print("An error ocured. Programm stopped running. "
+#                  "Please contact developer.")
 
 
 
