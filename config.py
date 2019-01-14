@@ -1,6 +1,10 @@
 #apppication default verbose and log levels
 DEFAULT_VERBOSE_LEVEL = 0
-DEFAULT_MESSAGE_FORMAT = '%(message)S'
+#DEFAULT_MESSAGE_FORMAT = '%(message)s'
+DEFAULT_MESSAGE_FORMAT = ("log time: %(asctime)s, "
+                          "log object: %(name)s, "
+                          "log level: %(levelname)s, "
+                          "message: %(message)s")
 
 
 CONFIG_LOCATION = 'Location'
