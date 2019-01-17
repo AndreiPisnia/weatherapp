@@ -18,6 +18,7 @@ class Configurate(Command):
     def run(self, argv):
         """Run command.
         """
+#        raise Exception
         parsed_args = self.get_parser().parse_args(argv)
         if parsed_args.provider:
             provider_name = parsed_args.provider

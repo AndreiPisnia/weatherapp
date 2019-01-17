@@ -89,7 +89,14 @@ class App:
 
         if command_name in self.commandmanager:
             command_factory = self.commandmanager.get(command_name)
-            return command_factory(self).run(remaining_args)
+            try:
+                return command_factory(self).run(remaining_args)
+            except Exception:
+                msg = "Error during command: %s run"
+                if self.options.debug:
+                    self.logger.exception(msg, command_name)
+                else:
+                    self.logger.error(msg, command_name)
 
         if not command_name:
             # run all weather providers by default

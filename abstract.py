@@ -3,6 +3,7 @@
 import abc
 import time
 import hashlib
+import logging
 import argparse
 import configparser
 from pathlib import Path
@@ -46,6 +47,7 @@ class WeatherProvider(Command):
 
     Defines behavior for all weather providers.
     """
+    logger = logging.getLogger('')
 
     def __init__(self, app):
         super().__init__(app)
@@ -117,6 +119,8 @@ class WeatherProvider(Command):
         except configparser.Error:
             print((f"Wrong configuration file. "
                   f"Please reconfigurate your provider: {self.name}"))
+            msg = "Error during command: %s run"
+            self.logger.exception(msg, command_name)            
         
         if self.get_name() in configuration.sections():
             location_config = configuration[self.get_name()]

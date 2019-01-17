@@ -5,6 +5,8 @@
 
 import re
 import urllib
+import logging
+
 
 from bs4 import BeautifulSoup
 
@@ -18,6 +20,8 @@ class AccuWeatherProvider(WeatherProvider):
     """Weather provider for Accuweather site.
     """
 
+    logger = logging.getLogger('')
+    
     name = config.ACCU_PROVIDER_NAME
     title = config.ACCU_PROVIDER_TITLE
 
@@ -51,12 +55,17 @@ class AccuWeatherProvider(WeatherProvider):
         """
         """
         locations = self.get_locations(config.ACCU_BROWSE_LOCATIONS, refresh=refresh)
+#        self.configure_logging()
+#        self.logger.debug('Got the following args %s', argv)
+
         while locations:
             for index, location in enumerate(locations):
                 print(f'{index + 1}. {location[0]}')
             try:
                 selected_index = int(input('Please select location: '))
             except ValueError:
+#                msg = "Error during command: %s run"
+#                self.logger.exception(msg, command_name)                
                 print ("Wrong choice. "
                        "Please restart configuration and input the number.")
                 break
