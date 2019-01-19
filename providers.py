@@ -120,6 +120,9 @@ class AccuWeatherProvider(WeatherProvider):
 class Rp5WeatherProvider(WeatherProvider):
     """Weather provider for Rp5 site.
     """
+
+    logger = logging.getLogger('')
+        
     name = config.RP5_PROVIDER_NAME
     title = config.RP5_PROVIDER_TITLE
 
@@ -210,12 +213,18 @@ class Rp5WeatherProvider(WeatherProvider):
         city_page = BeautifulSoup(page_content, 'html.parser')
         current_day = city_page.find('div', id="archiveString")
 #        current_day = city_page.find('div', class_="ArchiveInfo")
-
         weather_info = {'cond': '', 'temp': '', 'feal_temp': '', 'wind': ''}
-
+#        print (weather_info)
         archive_text = current_day.text
         info_list = archive_text.split(',')
-        weather_info['cond'] = info_list[1].strip()
+#        self.logger.debug('Got the following args %s', argv)
+#        print(info_list)
+        try:
+            weather_info['cond'] = info_list[1].strip()
+        except IndexError:
+            print('Conditions are not available right now.')
+#            msg = "Error during command: %s run"
+#            self.logger.exception(msg)#, command_name)                
         
         temp = current_day.find('span', class_="t_0")
         weather_info['temp'] = temp.text
