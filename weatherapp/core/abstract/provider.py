@@ -12,7 +12,7 @@ from urllib.request import Request, urlopen
 
 import requests
 
-import decorators
+from weatherapp.core import decorators
 from weatherapp.core import config
 from weatherapp.core.abstract.command import Command
 
