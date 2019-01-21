@@ -22,7 +22,10 @@ class App:
                      1: logging.INFO,
                      2: logging.DEBUG}
 
-    def __init__(self):
+    def __init__(self, stdin=None, stdout=None, stderr=None):
+        self.stdin = stdin or sys.stdin
+        self.stdout = stdout or sys.stdout
+        self.stderr = stderr or sys.stderr
         self.arg_parser = self._arg_parse()
         self.providermanager = ProviderManager()
         self.commandmanager = CommandManager()
@@ -36,15 +39,22 @@ class App:
         arg_parser.add_argument('command', help="Command", nargs='?')
         arg_parser.add_argument('--refresh', help="Bypass caches",
                                 action='store_true')
-        arg_parser.add_argument('--debug',
-                                action='store_true',
-                                default=False,
-                                help="Bypass catching errors")
+
+        arg_parser.add_argument('-f', '--formatter',
+                                action='store',
+                                default='table',
+                                help="Output format, defaults to table")
+
         arg_parser.add_argument('-v', '--verbose',
                                 action='count',
                                 dest='verbose_level',
                                 default=config.DEFAULT_VERBOSE_LEVEL,
                                 help='Increase verbosity of output.')
+
+        arg_parser.add_argument('--debug',
+                                action='store_true',
+                                default=False,
+                                help="Bypass catching errors")
         return arg_parser
 
     def configure_logging(self):
@@ -125,5 +135,3 @@ def main(argv=sys.argv[1:]):
 
 if __name__ == '__main__':
     main(sys.argv[1:])
-
-#end
