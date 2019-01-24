@@ -4,6 +4,7 @@
 """
 
 import re
+import sys
 import urllib
 import logging
 
@@ -18,6 +19,8 @@ from weatherapp.core.abstract.provider import WeatherProvider
 class AccuWeatherProvider(WeatherProvider):
     """Weather provider for Accuweather site.
     """
+
+    stdout = sys.stdout
 
     logger = logging.getLogger('')
     
@@ -59,13 +62,14 @@ class AccuWeatherProvider(WeatherProvider):
 
         while locations:
             for index, location in enumerate(locations):
-                print(f'{index + 1}. {location[0]}')
+                self.stdout.write(f'{index + 1}. {location[0]} \n')
+#                print(f'{index + 1}. {location[0]}')
             try:
                 selected_index = int(input('Please select location: '))
             except ValueError:
 #                msg = "Error during command: %s run"
 #                self.logger.exception(msg, command_name)                
-                print ("Wrong choice. "
+                self.stdout.write("Wrong choice. "
                        "Please restart configuration and input the number.")
                 break
                 

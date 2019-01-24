@@ -4,6 +4,7 @@
 """
 
 import re
+import sys
 import urllib
 import logging
 
@@ -19,6 +20,7 @@ class Rp5WeatherProvider(WeatherProvider):
     """Weather provider for Rp5 site.
     """
 
+    stdout = sys.stdout
     logger = logging.getLogger('')
         
     name = config.RP5_PROVIDER_NAME
@@ -68,35 +70,37 @@ class Rp5WeatherProvider(WeatherProvider):
         """
         countries = self.get_countries(config.RP5_BROWSE_LOCATIONS, refresh=refresh)
         for index, country in enumerate(countries):
-            print(f'{index + 1}. {country[0]}\n')
+            self.stdout.write(f'{index + 1}. {country[0]}\n')
+#            print(f'{index + 1}. {country[0]}\n')
         try:
             selected_index = int(input('Please select country: '))
         except ValueError:
-            print("Wrong choice."
-                  "Please restart configuration and input the number.")
+            self.stdout.write("Wrong choice."
+                  "Please restart configuration and input the number. \n")
             exit()
 
         try:
             country = countries[selected_index - 1]
         except IndexError:
-            print(f"Wrong choice: {selected_index}. "
-                  "Please make wright selection.")
+            self.stdout.write(f"Wrong choice: {selected_index}. "
+                  "Please make wright selection. \n")
             exit()
 
         cities = self.get_cities(country[1])
         for index, city in enumerate(cities):
-            print(f'{index + 1}. {city[0]}')
+            self.stdout.write(f'{index + 1}. {city[0]} \n')        
+#            print(f'{index + 1}. {city[0]}')
         try:
             selected_index = int(input('Please select city: '))
         except ValueError:
-            print("Wrong choice."
-                  "Please restart configuration and input the number.")
+            self.stdout.write("Wrong choice."
+                  "Please restart configuration and input the number. \n")
             exit()
         try:
             city = cities[selected_index - 1]
         except IndexError:
-            print(f"Wrong choice: {selected_index}. "
-                  "Please make wright selection.")
+            self.stdout.write(f"Wrong choice: {selected_index}. "
+                  "Please make wright selection. \n")
             exit()
             
 #        locations = self.get_locations(location[1], refresh=refresh)

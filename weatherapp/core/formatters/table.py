@@ -24,4 +24,8 @@ class TableFormatter(Formatter):
             if any(values):
                 pt.add_column(column, list(values))
 
+        pt.align = 'l'
+        pt.padding_width = 2
+        pt.hrules = 0
+        pt.vrules = 1
         return pt.get_string()
