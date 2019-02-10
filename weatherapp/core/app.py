@@ -122,7 +122,7 @@ class App:
         """Execute all available providers.
         """
 
-        for provider in self.providermanager._providers.values():
+        for name, provider in self.providermanager:
             self.produce_output(provider.title,
                                 provider(self).location,
                                 provider(self).run(argv))
@@ -147,19 +147,6 @@ class App:
         if command_name in self.providermanager:
             return self.run_provider(command_name, remaining_args)
 
-        if not command_name:
-            # run all weather providers by default
-            for name, provider in self.providermanager._providers.items():
-                self.produce_output(provider.title,
-                               provider(self).location,
-                               provider(self).run(remaining_args))
-            
-        elif command_name in self.providermanager:
-            # run specified provider
-            provider = self.providermanager[command_name](self)
-            self.produce_output(provider.title,
-                           provider.location,
-                           provider.run(remaining_args))
             
 def main(argv=sys.argv[1:]):
     """Main entry point
